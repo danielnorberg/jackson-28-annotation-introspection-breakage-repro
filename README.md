@@ -95,11 +95,11 @@ FoobarImpl{foo='foo', bar='bar'}
 
 # `jackson-databind` bisect
 
-* b30845f71 (2.8.7): Fail
-* 749edaaa0: Fail
-* 997261885: \<build failure\>
-* 0f9a4a5f2: Pass
-* 95f1df137: Fail
+* `b30845f71` (2.8.7): Fail
+* `749edaaa0`: Fail
+* `997261885`: \<build failure\>
+* `0f9a4a5f2`: Pass
+* `95f1df137`: Fail
 
 Culprits: [997261885](https://github.com/FasterXML/jackson-databind/commit/997261885) +
           [95f1df137](https://github.com/FasterXML/jackson-databind/commit/95f1df137)
