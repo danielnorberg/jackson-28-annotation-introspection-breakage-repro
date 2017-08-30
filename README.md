@@ -97,7 +97,7 @@ FoobarImpl{foo='foo', bar='bar'}
 
 * b30845f71 (2.8.7): Fail
 * 749edaaa0: Fail
-* 997261885: <build failure>
+* 997261885: \<build failure\>
 * 0f9a4a5f2: Pass
 * 95f1df137: Fail
 
