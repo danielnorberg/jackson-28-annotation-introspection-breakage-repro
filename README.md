@@ -93,7 +93,7 @@ FoobarImpl{foo='foo', bar='bar'}
 ```
 
 
-# Bisect
+# `jackson-databind` bisect
 
 * b30845f71 (2.8.7): Fail
 * 749edaaa0: Fail
