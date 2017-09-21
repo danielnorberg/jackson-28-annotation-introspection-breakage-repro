@@ -3,6 +3,7 @@ import static java.lang.annotation.ElementType.PARAMETER;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.AbstractTypeResolver;
 import com.fasterxml.jackson.databind.BeanDescription;
@@ -11,6 +12,7 @@ import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.PropertyName;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.introspect.Annotated;
 import com.fasterxml.jackson.databind.introspect.AnnotatedConstructor;
@@ -24,6 +26,10 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
 /**
+ * NOTE: Repro modified to illustrate problem with using {@code findNameForDeserialization} to solve
+ * below issue due to clash with explicit {@code @JsonProperty}.
+ *
+ * -----------------------------------------------------------------------------------------------------
  * A repro of an annotation introspection issue in jackson 2.8.8.
  *
  * Breaks: mvn -Djackson.version=2.8.8 compile exec:java -Dexec.mainClass=Repro
@@ -44,6 +50,7 @@ public class Repro {
     String foo();
 
     @JsonDeserialize(using = CustomStringDeserializer.class) // ... this annotation to unbreak deserialization.
+    @JsonProperty("renamed_bar")
     String bar();
   }
 
@@ -115,6 +122,18 @@ public class Repro {
   public static class FoobarAnnotationIntrospector extends NopAnnotationIntrospector {
 
     @Override
+    public PropertyName findNameForDeserialization(Annotated a) {
+      if (a instanceof AnnotatedParameter) {
+        final Field field = a.getAnnotation(Field.class);
+        if (field == null) {
+          return null;
+        }
+        return new PropertyName(field.value());
+      }
+      return null;
+    }
+
+    @Override
     public String findImplicitPropertyName(final AnnotatedMember member) {
       // Constructor parameter
       if (member instanceof AnnotatedParameter) {
@@ -162,7 +181,7 @@ public class Repro {
     final ObjectMapper mapper = new ObjectMapper()
         .registerModule(new FoobarModule());
 
-    final Foobar foobar = mapper.readValue("{\"bar\":\"bar\", \"foo\":\"foo\"}", Foobar.class);
+    final Foobar foobar = mapper.readValue("{\"renamed_bar\":\"bar\", \"foo\":\"foo\"}", Foobar.class);
 
     System.out.println(foobar);
   }
