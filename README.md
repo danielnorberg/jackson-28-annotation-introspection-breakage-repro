@@ -3,6 +3,7 @@ Jackson 2.8.8 Annotation Introspection Issue Repro
 
 A repro of an annotation introspection issue in jackson 2.8.8.
 
+*Note*: This was [reported](https://github.com/FasterXML/jackson-databind/issues/1756) and has been fixed in jackson 2.9.2.
 
 * Jackson 2.8.8:
 
